@@ -235,4 +235,6 @@ before_script:
 
 如果觉得好，给项目点颗星吧～
 
-
+## License
+Copyright (c) 2017 Zhaoqing Peng (ppp8300885@gmail.com)
+Licensed under the MIT License (LICENSE)
