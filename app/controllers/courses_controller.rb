@@ -1,6 +1,6 @@
 class CoursesController < ApplicationController
 
-  before_action :student_logged_in, only: [:select, :quit, :list]
+  before_action :student_logged_in, only: [:select, :quit, :list, :statistic]
   before_action :teacher_logged_in, only: [:new, :create, :edit, :destroy, :update, :open, :close]#add open by qiao
   before_action :logged_in, only: :index
 
@@ -56,10 +56,17 @@ class CoursesController < ApplicationController
   end
 
   #-------------------------for students----------------------
+  def statistic
+    @course=current_user.courses.paginate(page: params[:page], per_page: 10)
+  end
+  
+  def timetable
+    @course=current_user.courses.paginate(page: params[:page], per_page: 10)
+  end
 
   def list
     #-------QiaoCode--------
-    @courses = Course.where(:open=>true).paginate(page: params[:page], per_page: 4)
+    @courses = Course.where(:open=>true).paginate(page: params[:page], per_page: 10)
     @course = @courses-current_user.courses
     tmp=[]
     @course.each do |course|
@@ -71,10 +78,30 @@ class CoursesController < ApplicationController
   end
 
   def select
-    @course=Course.find_by_id(params[:id])
-    current_user.courses<<@course
-    flash={:suceess => "成功选择课程: #{@course.name}"}
-    redirect_to courses_path, flash: flash
+    @courses=current_user.courses.paginate(page: params[:page], per_page: 10)
+    @course = Course.find_by_id(params[:id])
+    # @course = Course.find(:all, :select => 'id')
+    tmp = 0
+    @courses.each do |course|
+      if (course == @course)
+        tmp = 1
+        flash={:warning => "您已选过该课程: #{@course.name}"}
+        return redirect_to list_courses_path, flash: flash
+      end
+      
+      if ((course.course_time[0..1] == @course.course_time[0..1]) && ((@course.course_time[3] >= course.course_time[3])&&(@course.course_time[3] <= course.course_time[5]) || (@course.course_time[5] >= course.course_time[3])&&(@course.course_time[5] <= course.course_time[5])))
+        tmp = 1
+        flash={:warning => "与已选课程：#{course.name}   时间冲突:)"}
+        return redirect_to list_courses_path, flash: flash
+      end
+      
+    end
+    
+      if (tmp == 0)
+        current_user.courses<<@course
+        flash={:suceess => "成功选择课程: #{@course.name}"}
+        return redirect_to (courses_path),  flash: flash
+      end
   end
 
   def quit
@@ -88,8 +115,8 @@ class CoursesController < ApplicationController
   #-------------------------for both teachers and students----------------------
 
   def index
-    @course=current_user.teaching_courses.paginate(page: params[:page], per_page: 4) if teacher_logged_in?
-    @course=current_user.courses.paginate(page: params[:page], per_page: 4) if student_logged_in?
+    @course=current_user.teaching_courses.paginate(page: params[:page], per_page: 10) if teacher_logged_in?
+    @course=current_user.courses.paginate(page: params[:page], per_page: 10) if student_logged_in?
   end
 
 

@@ -26,6 +26,8 @@ Rails.application.routes.draw do
     end
     collection do
       get :list
+      get :statistic
+      get :timetable
     end
   end
 
