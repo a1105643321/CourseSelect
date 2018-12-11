@@ -64,7 +64,7 @@ class CoursesController < ApplicationController
     tmp=[]
     @course.each do |course|
       if course.open==true
-        tmp<<course
+        tmp << course
       end
     end
     @course=tmp
