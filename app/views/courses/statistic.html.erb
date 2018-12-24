@@ -17,12 +17,14 @@
 		        <tr>
 		           <th>类别</th>
 		           <th>公共必修课程及学分</th>
-		           <th>公共必修课学分要求</th>
+		           <th>公共必修课程及学分</th>
 		           <th>专业学位课学分要求</th>
 		           <th>总学分要求</th>
 		    	 </tr>
 		   	   </thead>
 		   	   <tbody>
+		   	   	<% pro_credit = 0.0 %>
+		   	   	<% act_credit = 0.0 %>
 		   	   	 
            <tr>
               <th>学习要求</th>
@@ -41,6 +43,7 @@
           <tr>
 		   			<th>选课情况</th>
 		   			<td>
+		   				
 		   			  <% @course.each do |course| %>
 		   			  <% if course.course_type=="公共必修课"; %><div><%= course.name %></div><% end %> 
 		   				<% end %>
@@ -57,6 +60,7 @@
 		   			  <% @course.each do |course| %>
 		   			  <% if course.course_type[0..1]=="专业" ||course.course_type[0..1]== "一级" ; %><% sum += (course.credit[-3..-1].to_f) %><% end %>
 		   			  <% end %>
+		   			  <% pro_credit = sum %>
 		   			  <div><%= sum.to_s + "学分"  %></div>
 		   			</td>
 		   			<td>
@@ -71,7 +75,7 @@
 		   			<th>获取学分</th>
 		   			<td>
 		   			  <% @grade.each do |grade| %>
-		   			  <% if grade.grade != '' && grade.grade.to_f >= 60 ; %><div><%= grade.course.name %></div><% end %> 
+		   			  <% if grade.grade != '' && grade.grade.to_f >= 60 && grade.course.course_type=="公共必修课"; %><div><%= grade.course.name %></div><% end %> 
 		   				<% end %>
 		   			</td>
 		   			<td>
@@ -86,6 +90,7 @@
 		   			  <% @grade.each do |grade| %>
 		   			  <% if grade.grade != '' && grade.grade.to_f >= 60 && (grade.course.course_type[0..1]=="专业" ||grade.course.course_type[0..1]== "一级"); %><% sum += (grade.course.credit[-3..-1].to_f) %><% end %> 
 		   				<% end %>
+		   				<% act_credit = sum %>
 		   				<div><%= sum.to_s + "学分"  %></div>
 		   			</td>
 		   			<td>
@@ -96,8 +101,20 @@
 		   				<div><%= sum.to_s + "学分"  %></div>
 		   			</td>
 		   		</tr>
-           </tbody>
+          </tbody>
+          <% if act_credit < pro_credit %>
+         		<div><%= "  温馨提示: 您的专业课 " %>
+          		<% @grade.each do |grade| %>
+          		 	<% if grade.grade == nil && (grade.course.course_type[0..1]=="专业" ||grade.course.course_type[0..1]== "一级"); %><%= grade.course.name %><% end %>
+          		<% end %>
+          		<%= "目前还没有分数，" %>
+          		<% @grade.each do |grade| %>
+          		 	<% if grade.grade != nil && grade.grade.to_f < 60 && (grade.course.course_type[0..1]=="专业" ||grade.course.course_type[0..1]== "一级"); %><%= grade.course.name %><% end %>
+          		<% end %>
+          		<%= "分数低于60分，无法获得相应学分，如有偏差请及时到教务处核实！" %></div>
+          <% end %>
           </table>
+          
           <%= will_paginate @course %>
         </div>
       </div>
