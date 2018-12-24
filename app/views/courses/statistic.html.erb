@@ -17,7 +17,7 @@
 		        <tr>
 		           <th>类别</th>
 		           <th>公共必修课程及学分</th>
-		           <th>公共必修课程及学分</th>
+		           <th>公共必修课学分要求</th>
 		           <th>专业学位课学分要求</th>
 		           <th>总学分要求</th>
 		    	 </tr>
@@ -69,7 +69,32 @@
 		   		</tr>
 		   		<tr>
 		   			<th>获取学分</th>
-		   		
+		   			<td>
+		   			  <% @grade.each do |grade| %>
+		   			  <% if grade.grade != '' && grade.grade.to_f >= 60 ; %><div><%= grade.course.name %></div><% end %> 
+		   				<% end %>
+		   			</td>
+		   			<td>
+		   				<% sum=0.0 %>
+		   			  <% @grade.each do |grade| %>
+		   			  <% if grade.grade != '' && grade.grade.to_f >= 60 && grade.course.course_type=="公共必修课"; %><% sum += (grade.course.credit[-3..-1].to_f) %><% end %> 
+		   				<% end %>
+		   				<div><%= sum.to_s + "学分"  %></div>
+		   			</td>
+		   			<td>
+		   				<% sum=0.0 %>
+		   			  <% @grade.each do |grade| %>
+		   			  <% if grade.grade != '' && grade.grade.to_f >= 60 && (grade.course.course_type[0..1]=="专业" ||grade.course.course_type[0..1]== "一级"); %><% sum += (grade.course.credit[-3..-1].to_f) %><% end %> 
+		   				<% end %>
+		   				<div><%= sum.to_s + "学分"  %></div>
+		   			</td>
+		   			<td>
+		   				<% sum=0.0 %>
+		   			  <% @grade.each do |grade| %>
+		   			  <% if grade.grade != '' && grade.grade.to_f >= 60; %><% sum += (grade.course.credit[-3..-1].to_f) %><% end %> 
+		   				<% end %>
+		   				<div><%= sum.to_s + "学分"  %></div>
+		   			</td>
 		   		</tr>
            </tbody>
           </table>

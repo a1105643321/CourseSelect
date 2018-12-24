@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :logged_in, only: :update
+  before_action :logged_in, only: [:update, :edit]
   before_action :correct_user, only: [:update, :destroy]
 
   def new

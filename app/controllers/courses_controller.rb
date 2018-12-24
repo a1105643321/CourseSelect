@@ -58,6 +58,7 @@ class CoursesController < ApplicationController
   #-------------------------for students----------------------
   def statistic
     @course=current_user.courses.paginate(page: params[:page], per_page: 10)
+    @grade = current_user.grades.paginate(page: params[:page], per_page: 10)
   end
   
   def timetable
@@ -97,8 +98,17 @@ class CoursesController < ApplicationController
       
     end
     
+        if (@course.limit_num != '' && (@course.limit_num == @course.student_num))
+          tmp = 1
+          flash={:warning => "#{@course.name}课程人数已达上限:)"}
+          return redirect_to list_courses_path, flash: flash
+        end
+    
       if (tmp == 0)
         current_user.courses<<@course
+        tmp2 = @course.student_num + 1
+        @course.update_attributes(:student_num => tmp2)
+
         flash={:suceess => "成功选择课程: #{@course.name}"}
         return redirect_to (courses_path),  flash: flash
       end
@@ -107,6 +117,10 @@ class CoursesController < ApplicationController
   def quit
     @course=Course.find_by_id(params[:id])
     current_user.courses.delete(@course)
+    if @course.student_num > 0
+      tmp3 = @course.student_num - 1
+      @course.update_attributes(:student_num => tmp3)
+    end   
     flash={:success => "成功退选课程: #{@course.name}"}
     redirect_to courses_path, flash: flash
   end
