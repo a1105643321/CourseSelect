@@ -227,6 +227,18 @@ before_script:
   - psql -c 'create database courseselect_test;' -U postgres
 ```
 
+
+#新加入了部分功能
+
+1 学分提示功能
+2 课程表功能
+3 选课冲突功能
+
+#测试部分最后测试覆盖率
+<img src="/lib/test.png" width="700">
+
+
+
 ## How to Contribute
 
 先fork此项目，在分支修改后，pull request到主分支
